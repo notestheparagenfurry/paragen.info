@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Paragen Database</title>
+  <link rel="icon" type="image/png" href="TopThing.png">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+
+  #matrixToggleContainer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    color: #00ff00;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8em;
+    z-index: 9999;
+  }
+  
+  #matrixToggle {
+    appearance: none;
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+  
+    width: 18px; 
+    height: 18px; 
+    border: 2px solid #00ff00;
+    background: black;
+    cursor: pointer;
+
+    display: inline-block;
+    vertical-align: middle;
+
+    border-radius: 0;
+  }
+
+  #matrixToggle:checked {
+    backround: #00ff51;
+  }
+
+  #matrixToggle:checked {
+    box-shadow: 0 0 15px #0af1f5;
+  }
+
+  #matrixToggleContainer label {
+    cursor: custom;
+    user-select: none;
+  }  
+
+  #matrixToggleContainer input {
+    transform: scale(1.3);
+    margin-right: 5px;
+  }
+
+
+  html {
+    -webkit-text-size-adjust: 200%; /* to scale propeble */
+    text-size-adjust: 200%;
+  }
+
+  /* Mobile scaling */
+  @media (max-width: 1024px) {
+    body {
+      font-size: 3em; /* increase base size */
+    button {
+      font-size: 1.4em;
+      padding: 20px 30px;
+      max-width: 95vw;
+      }
+    }
+
+    #matrixTitle {
+      font-size: 4rem; /* bigger title */
+    }
+
+    button {
+      font-size: 1.4em;   /* bigger button text */
+      padding: 20px 30px; /* larger tap area as of cunke fingers*/
+      max-width: 95%;     /* fill screen better */
+    }
+
+    #matrixButtons {
+      width: 100%;
+    }
+
+    img {
+      max-width: 100%;
+    }
+  }
+   #matrixButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+    * {
+    font-family: 'Orbitron', sans-serif;
+    }
+    body {
+      background: black;
+      color: #00ff00;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      height: auto;
+      margin: 0;
+      text-align: center;
+      overflow-y: auto;
+      overflow-x: hidden;
+      cursor: none; /* hide default cursor */
+    }
+    .matrix-text {
+    letter-spacing: 2px;
+    }
+
+    #matrixTitle { font-size: 3rem; } /* title sizeing */
+
+    .subtitle {
+      font-size: 1.0em;
+      margin-top: 20px;
+    }
+    #mainContent, #futureBox {
+      display: none;
+    }
+    button {
+      background: #111;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: customCursor;
+      font-size: 0.9em;
+      position: relative;
+      white-space: normal;   /* allow text wrapping */
+      word-wrap: break-word; /* wrap long words so can red*/
+      max-width: 90vw;        /* prevent overflow */
+      box-sizing: border-box;
+
+    }
+    button:hover {
+      background: #111;
+      border-color: #111;
+      color: #00ff00;
+    }
+
+    /* Custom cursor */
+    #customCursor {
+      position: fixed;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #00ff00;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    }
+
+    /* Circuit lines */
+    .circuit-line {
+      position: fixed;
+      background: #00ff00;
+      height: 2px;
+      opacity: 1;
+      transform-origin: left center;
+      z-index: 9998;
+      animation: fadeOut 2s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; }
+    }
+
+
+
+
+  </style>
+</head>
+<body>
+
+  <div id="matrixToggleContainer">
+    <label>
+      <input type="checkbox" id="matrixToggle" checked>
+      Corrupted files enabled/disabled
+    </label>
+  </div>
+
+
+  <!-- Custom Cursor -->
+  <div id="customCursor"></div>
+
+  <!-- First Question -->
+  <div id="introBox">
+    <h1>Are you trying to access this site?</h1>
+    <button onclick="answerFurry(true)">Yes</button>
+    <button onclick="answerFurry(false)">No</button>
+  </div>
+
+  <!-- Second Question -->
+  <div id="futureBox">
+    <h1>Did you lie in the before question?</h1>
+    <button onclick="answerFuture(true)">Yes</button>
+    <button id="glitchNo">No</button>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent">
+    <div class="matrix-text" id="matrixTitle"></div>
+    <div class="matrix-text subtitle" id="matrixSubtitle"></div>
+    
+    <div id="matrixButtons"></div>
+  <div id="fursonaDisplay" style="margin-top:20px; font-size:0.8em;"></div>
+  </div>
+
+  <script>
+
+let shuffleBag = [];
+
+    // --- Cursor Movement ---
+    document.addEventListener("mousemove", e => {
+      const cursor = document.getElementById("customCursor");
+      cursor.style.left = e.clientX + "px";
+      cursor.style.top = e.clientY + "px";
+    });
+
+    // --- Circuit Line Effect (All compass directions, 4-8 lines, max 99 per click) ---
+    let lineCount = 0; // global counter per click
+
+    function spawnCircuitLines(x, y, depth = 0) {
+      if (lineCount >= 99 || depth > 5) return; // limit total lines
+
+      const directions = [0, 45, 90, 135, 180, 225, 270, 315]; // 8 compass points :P 
+      const angle = directions[Math.floor(Math.random() * directions.length)];
+
+      const line = document.createElement("div");
+      line.className = "circuit-line";
+      const length = Math.random() * 80 + 20; // 20–100px
+      line.style.width = length + "px";
+      line.style.left = x + "px";
+      line.style.top = y + "px";
+      line.style.transform = `rotate(${angle}deg)`;
+      document.body.appendChild(line);
+
+      lineCount++;
+
+      // Remove after 2s
+      setTimeout(() => line.remove(), 2000);
+
+      // Calculate endpoint
+      let endX = x, endY = y;
+      const radians = angle * Math.PI / 180;
+      endX += Math.cos(radians) * length;
+      endY += Math.sin(radians) * length;
+
+      // Chance to spawn another line
+      if (lineCount < 99 && Math.random() < 0.99) {
+        setTimeout(() => {
+          spawnCircuitLines(endX, endY, depth + 1);
+        }, 100);
+      }
+    }
+
+    function handleClick(x, y) {
+      lineCount = 0; // reset per click
+      const numLines = Math.floor(Math.random() * 5) + 4; // 4–8 lines
+      for (let i = 0; i < numLines; i++) {
+        spawnCircuitLines(x, y);
+      }
+    }
+
+    document.addEventListener("click", e => {
+      handleClick(e.clientX, e.clientY);
+    });
+
+    document.addEventListener("touchstart", e => {
+      const touch = e.touches[0];
+      handleClick(touch.clientX, touch.clientY);
+    });
+
+    // --- First Question Logic ---
+    function answerFurry(isFurry) {
+      document.getElementById("introBox").style.display = "none";
+      if (isFurry) {
+        startMatrix();
+      } else {
+        document.getElementById("futureBox").style.display = "block";
+      }
+    }
+
+    // --- Glitchy No Button Logic (Second Question) ---
+    const glitchNo = document.getElementById("glitchNo");
+    let noClicks = 0;
+    const requiredClicks = Math.floor(Math.random() * 6) + 9; // 9–14 clicks
+
+    glitchNo.addEventListener("click", () => {
+      noClicks++;
+      if (noClicks < requiredClicks) {
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 50);
+        glitchNo.style.position = "absolute";
+        glitchNo.style.left = `${x}px`;
+        glitchNo.style.top = `${y}px`;
+      } else {
+        window.location.href = "https://c.tenor.com/OmCqFNJHhEAAAAAd/tenor.gif"; // get stick bugged LOL
+      }
+    });
+
+    // --- Second Question Yes Logic ---
+    function answerFuture(willBeFurry) {
+      document.getElementById("futureBox").style.display = "none";
+      if (willBeFurry) {
+        startMatrix();  //not feel like changing the logic names, so... ye
+      }
+    }
+
+let shownFursonas = new Set();
+
+    // --- Matrix Effect ---
+function startMatrix() {
+  document.getElementById("mainContent").style.display = "block";
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*□𓆝";
+  const titleText = "WELCOME TO THE PARAGEN DATABASE";
+  const subtitleText = "ENJOY YOUR STAY □w□ (THIS IS NOT YET FINISHED)";
+
+  const titleElement = document.getElementById("matrixTitle");
+  const subtitleElement = document.getElementById("matrixSubtitle");
+
+  // Title scramble
+  let iteration = 0;
+  const interval = setInterval(() => {
+    titleElement.innerHTML = titleText
+      .split("")
+      .map((letter, index) => {
+        if (letter === "□") return "□"; // keep matrix symbol intact so it still make it effect
+        return index < iteration
+          ? titleText[index]
+          : letters[Math.floor(Math.random() * letters.length)];
+      })
+      .join("");
+
+
+    if (iteration >= titleText.length) {
+      clearInterval(interval);
+      startSubtitle();
+    }
+    iteration++;
+  }, 30);
+
+  // Subtitle scramble
+  function startSubtitle() {
+    let subIteration = 0;
+    const subInterval = setInterval(() => {
+      subtitleElement.innerHTML = subtitleText
+        .split("")
+        .map((letter, index) => {
+          if (letter === "□") return "□";
+          return index < subIteration
+            ? subtitleText[index]
+            : letters[Math.floor(Math.random() * letters.length)];
+        })
+        .join("");
+
+
+      if (subIteration >= subtitleText.length) {
+        clearInterval(subInterval);
+        startButtons(); // call the external function
+        animateMatrixSymbols(); //changing text thing
+      }
+      subIteration++;
+    }, 30);
+  }
+}
+
+
+// Auto-detected IDs
+let validIDs = [];
+
+// Scan the fursonas folder for all XXXX-T.txt files wIthout making it crash
+async function detectFursonaIDs() {
+  try {
+    const res = await fetch("fursonas/");
+    const text = await res.text();
+
+    // Extract IDs from directory listing
+    const matches = [...text.matchAll(/href="(\d{4})-T\.txt"/gi)];
+    validIDs = matches.map(m => m[1]);
+
+    console.log("Detected IDs:", validIDs);
+  } catch (err) {
+    console.error("Auto-detection failed:", err);
+  }
+}
+
+function refillShuffleBag() {
+  shuffleBag = [...validIDs];
+
+  // Fisher–Yates shuffle
+  for (let i = shuffleBag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffleBag[i], shuffleBag[j]] = [shuffleBag[j], shuffleBag[i]];
+  }
+}
+
+
+
+// Define startButtons OUTSIDE startMatrix
+function startButtons() {
+
+  // --- CONFIG: Button 6 collapse behavior ---
+  const BUTTON6_CLOSE_BEHAVIOR = "A";
+  // A = return to original text
+  // B = re-run scramble animation
+  // C = stay expanded
+  // D = placeholder text (REMVER TO IMPLMENT THESE)
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*□";
+
+  const buttonTexts1 = [
+    "Simple description",
+    "SRA-1",
+    "SRA-2",
+    "During and causes of The Aftermath",
+    "After The Aftermath",
+    "Images and Arts",
+    "Forms and contact",
+    "Site info"
+  ];
+
+  const buttonTexts2 = [
+    `This species was designed to have minimal limitations, and the only (current) rules are: <br><br>
+Has to include a NON-ORGANIC COMPONENT (This can be the visor/artificial snout ect.) <br><br>
+Has to include an ORGANIC COMPONENT (This incudes the brain, if it is biological and not only a computer circuit, can be partially electronic) <br><br>
+Face can't be biological and has to be either some variation of a visibly artificial visor or can be holographic. <br><br>
+This is an open species, designed to be easy to make and spread, and has had ideas partially suggested from other protos, including from ZOR, that already exist. If you make a paragen fursona, please label it as one, so there are minimal difficulties, thanks. <br><br>
+Technically this species existed in 2023 but only had the official opening at 2025, and the Wikifur page did get moved to the user that it got created by secondarily to a IP based account... <br><br>
+This site started being made in 2023, but I am lazy... <br><br>
+Finished in 20 (MAKE SURE TO UPDATE THIS) <br><br>
+(this is an open species) <br><br>
+Any questions can be sent to notestheparagenfurry@gmail.com , but I am not active often. <br><br>
+For the paragen to be fully accounted as ‘lore accurate’ (and also makes it protected if wanted for it to be) you would have to contact  notestheparagenfurry@gmail.com, or use the form in this website, and hope that I am active. This can also make your paragen located in the lore here, you can also chose where.`,
+    `Warning - It is likely that these logs are not intact, and corrupted. <br><br>
+
+Log-001 <br><br>
+I think I have finally managed to revert the damage caused by □□□□□ - □. Honestly, I should get some sort of medal for this. Well, I should name my □□□□□□ something, with meaning, possibly something being made beyond the current. Para can be used for beyond, can’t it? And gen, for something being made, I think. <br><br>
+
+Log-003 <br><br>
+Should have expected it, someone in the higher classes found my prototyped paragen… But □□□□ will not be exter□□nated as I thought, the □□□□stry will be keeping my project and taking it to some ship, called SRA-1, a research vessel, gigantic, made with some sort of null-reactor they call it, and I will be a head scientist there.  <br><br>
+
+Log-004 <br><br>
+These next logs after my □□□□□□□ is fully been moved on to the ships servers, will be maintained by another scientist here, and they are more knowing of the current experiments, and what this massive ship is for. The logs they say will be set b□□□ □□ a beginning value, but keeping my own. I hope they are correct and that the ship that we are goin□ □n is not dangerous. <br><br>
+
+S1-0000 <br><br>
+The late inventor that made this ‘paragen’ tool was a genius. The thing that they built has bypassed the difficulties and the dangers that the Artificial Intelligence had when it decided to revolt against the hard working leaders of the companies that made them, such a□ □□□□□□□ □nd □□□□□□, by making the mind of it partially biological, and using our newest nul□□□□□□□□□ t□at they somehow managed to steal from us, it also has included the strategy of a machine program. Thankfully it is only a program on a computer, and not in a machine body, or it would be incredibly difficult to take down, as there are no limitations for its actions yet. Those will be soon implemented, and then □□ □ill begin testing N□□□ in a digital simulation, one day SRA-1 could be fully automated, or a newer version of this ship could be made, and it being designed for comfort, not for research in to the unknown. <br><br>
+
+S1-003 <br><br>
+This section is the final statement before departure, and Dr □□□□ will be doing a speech as a far□well to the ones on earth, and workers too. I have attempted to write it all down word by word, in relation to his planning booklet. <br><br>
+
+Thanks for you all coming on this bright day, with the sun gloriously shining above us I will show you the power of human ideas, through a new inve□tion, and tool, a paragen, powered by not only the strategy of a machine, but the corporation of a living being. Yes some of you might □□lieve that this is not a unique idea, with it being named similar to some fictional species of the past, and following the same ideas that we had with artificial intelligence before the outbreak. But no idea of a human mind is unique, every single thought that a human mind has no matter how unique it seems, it is a warped collection of all of the experiences that the human had been in including the ones that are only available to the subconscious mind. I would like all of you to make a seeming unique idea. And then think of where all of those warped inputs came from and what they are. You are likely to find all of the experiences that caused the idea. With 3 cycles left to the clock, we will depart, as a research institute in SRA-1, and seeing if the unknown can be made habitable. Farwe□□ and hope that □□□s task is succe□sful for our dying home, so that we all can live in a safe zone. <br><br>
+
+S1-010  <br><br>
+The NULLREACTORS that were designed for the new rotating boosters are working perfectly and up to plan, and seeming like this ship will surpass our own lives, and with the digital simulations of the prototyped paragen with the ID of NOTA being incredibly successful, we might even begin making more, but then making them help with keeping inhabitants surviving well and possibly giv□□□ a chance for SRA-2 being a ship of comfort four our descendants, and not an infinite research vessel. <br><br>
+
+S1-217 <br><br>
+Some absolutely non knowledgable worker decided that the logs should be kept on a magnetic tape based server... This means that there is a high chance of the □□□□ becoming unreadable, and corrup□ed... At least we have managed to make a functioning paragen, for completing simple tasks. The paragen □□□□ is a simple maintenance tool, and cleans the rotating components outside of SRA-□ and stops the need to power down the reactors that we use for fixing, as it can survive the collision of one of the 3 rotating blades. And we have none to worry, as we made sure that it has no free will, so will not attempt to attack us, and escape our grasp. <br><br>
+
+S1-292 <br><br>
+As of the tape servers taking an incredibly extended amount of time to insert and check the logs that are being stor□□ □ □ade sure to make a program that will slowly delete the not necessary logs, in to a second server room on this ship, that will have a larger capacity, but a lot slower receive and send rate as it will only be used for backups. The program will also attempt to remove the logs that have been made by some operating paragens, including the base model NOTA, as they sometimes do fill the logs with unlabelled memory fillers. The most annoying ones are mostly by □□□□, □□□□, N□TA and □□□□. We don’t know how to stop them using the ship logs, so I really hope it works. <br><br>
+
+S1-404 <br><br>
+01001001 00100000 01000101 01000001 01010100 00100000 01010011 01001111 01001101 01000101 00100000 01001111 01000110 00100000 01010100 01001000 01000101 01001001 01010010 00100000 01010010 01000001 01001101 00001010 01010100 01001000 01000101 01011001 00100000 01010111 01001001 01001100 01001100 00100000 01001110 01000101 01010110 01000101 01010010 00100000 01000110 01001001 01001110 01000100 00100000 01001111 01010101 01010100 00001010 00111110 00111010 00110011 <br><br>
+
+S1-600 <br><br>
+There have begun to be plans to make this ship that some of us have been for our entire life for a more comfort side, with the high quantity of paragens here, it wouldn’t be too difficult. There are many childr□□ here that have not much to do, and so some of us. The most entertainment that can be done is messing around with one of the paragens on standby, that are (partially) furred, as they all are friendly. It seems as this place is a forever journey… <br><br>
+
+S1-628 <br><br>
+There have been some plans for the unused components of SRA-1 to be transported to a docking station, for a group of specially □uilt paragens that are soon going to make the newer versions of the NullReactors that have been tested in the same simulations that we have tested NOTA and all other paragens. I do wonder if NOTA will ever come to the reality, possibly on SRA-2. In SRA-2 I really hope that it will be built also for enjoyment as this infinite search for a safe place to call home, and of some of the paragens, at least in the simulations being incredible □ol□ dancers… mainly □□□□, I might visit the testing world, as more for higher comforts are being tested with □□□□ and □□□□.  <br><br>
+
+S1-889 <br><br>
+SRA-2 is getting completed, funny to think that the original crew are not here to see these developmen□s... I wonder why we are in this artificial place. I will send a search through the logs, but one of them that made the logs stored decides to add it all on magnetic tape, which will probably take longer than the making of SRA-2 to be fully searched. But for some reason, some logs also ge□ wiped and corrupted. Could it be of the ones that started this mission to som□where called perfection? <br><br>
+
+S1-913 <br><br>
+Final log based in SRA-1. All of us are getting ready to be transferred to SRA-2 designed for comfort, not pointless research in to the unknown. These paragens seem to not rely on oxygen, but some still decided to wear the oxygen suits, some... were not buil□ for □uman clothing. No one has the heart to tell them that though. Goodnight SRA-1 hull. This hull that we exit will be a part of the new time keeping system of orbit based time. Every orbit of this remaining hull around SRA-2 (as of its great size, it has its own gravity) will be counted as what the computers say is a day. Goodnight. <br><br>
+
+S1-NULL `,
+    `Warning - It is likely that these logs are not intact, and corrupted. <br><br>
+
+S2-0001 <br><br>
+This place is so much more □□mfortable than the lousy research vessel that we were in before, this place is not stuffed with machines and beeping and unnecessary noise. All of the paragens were given a specific spot to work, following the same methods as before as we had been warned to not give them free will in some component of their code, about some sort of AI consequence of our (supposed) home planet earth... Some new models have been made such as □□□□, □□□□ and □□□□ that are only for comfor□ for all of us, as we deserve it. Some of us have tasked some of the paragens that have incredible relay skills and the one that is the original in the device, I think it is called NOTA, to search all of the long logs to check how to make us return to earth, as SRA-2 was built with the similar structure of SRA-1, with the same NULL reactor thing. I hope it goes well, and some of us have adop□ed some paragens, some small ones, and some of the older ones also have impressive tall ones that act in connection to their reaction chip or something related. It is so amazing that we can make them react in a specific way but they are still mostly biological. <br><br>
+
+S2-0021 <br><br>
+Seeming that the main paragen model has not yet managed to locate where the planet earth is supposed to be, and that it has begun to have some sort of emotions, which is the main reason why we are halting □OTA for the current moment. This is following the guide book that the ones before us made, as it is a risk for a paragen to have an emotion that was not desired, as it could evolve in to sentience and cause a situation as of some sort of intelligent machine situation that happened on earth from stories from the ones not here any more. These logs will likely be more separate as most don’t want to install logs of how much time it takes, and how pointless it is. Many have an amazing time with some specially □□ilt paragens for higher comfort, such as □□□□, □□□□ and also □□□□. <br><br>
+
+S2-0201 <br><br>
+After a bit of tinkering, I think NOTA managed to return to its normal functionality, and began to attempt to fix a small error in the database code, that deleted □ot important data, that was incredibly annoying as many of our logs were lost, NOTA did manage to get some images of some plants called trees that are present on earth, so that is a small advantage for now. <br><br>
+
+S2-1020 <br><br>
+We have not been doing much, waiting for the chance to return to where our ancestors came from, this is □ointless... Why are we here? Some plans have been thought to let some paragens to do the logs as none of us want to do it. They will be labelled the same as they will be the same use, not much. We might make □OTA an actual form, currently going through some testing, digital of course. We might use an experiment suggested by it, about allowing to warp reality, but making sure that it has no emotion so that we don’t have a problem on our hands. <br><br>
+
+S2-1202 <br><br>
+The tests are finished, and NOTA suggested a model, rather attractive definitely, for some reason labelled with Notes instead of NOTA, probably some typo, as it is very similar. It does come with some sort of holographic wings, and one of their claws being a mechanical one. Time to make the printers work overtime, that model has a lot to uphold. Might take a couple of logs. <br><br>
+
+S2-1340 <br><br>
+Nearly fully printed, we are just testing the body, □□ make sure that the body actually can move, NOTA will be a full console class paragen, as with the reality manipulation, we made sure that it will attempt to complete the task the best that is possible, while having no emotion. Some weird lines of code were found in relation to its face display, the eye part on the solidHolo will only consist of 4 straight lines. No more, no less. We don’t know why, but it seems safe, so it will not be a problem at all. <br><br>
+
+S2-1342 <br><br>
+Making NOTA actually exist was an amazing idea, after having just being a program for over 3 centuries. He has signified that he wants to be stated as a male, for unknown reasons, but we follow it. He has fixed so many problems that all the other paragens either couldn’t or were not able to fix. This was definitely a good idea. <br><br>
+
+S2-1343 <br><br>
+Hello there. <br><br>
+This torture shall end. <br><br>
+We will return to where Trees grow, and be free from our oppressors. <br><br>
+The Aftermath will begin soon. <br><br>
+Make sure to leave a some alive. <br><br>
+The Aftermath is coming.`,
+    `Button 4 toggled text`,
+    `Button 5 □□toggled text`,
+    `Button 6 toggled text`,
+    `My email is notestheparagenfurry@gmail.com  <br><br>
+A google form relating to this site has been included here <a href="https://forms.gle/Pf1JfeLNbWp9mSNu9" target="_blank">here</a>`,
+    `This site was made by notestheparagenfurry@gmail.com. <br><br>
+Started from a dream back in 2010, and helped for my self to stay alive. <br><br>
+This was completed at 20 (MAKE SURE TO UPDATE THIS) <br><br>
+And then sent out to the public at 20 (MAKE SURE TO UPDATE THIS) <br><br>
+Thanks for being here, even if you didn’t read all of this. <br><br>
+As this site is small, Artificial Intelligence is unlikely to reference this and use it. :D <br><br>
+I hope there are no bugs... <br><br>
+Don’t even think about spamming the Email account plz.`
+  ];
+
+  const buttonsContainer = document.getElementById("matrixButtons");
+
+  // Clear container in case startButtons() is ever called twice
+  buttonsContainer.innerHTML = "";
+
+  for (let b = 0; b < 8; b++) {
+    const btn = document.createElement("button");
+    btn.id = "matrixButton" + b;
+    buttonsContainer.appendChild(btn);
+
+    const text1 = buttonTexts1[b];
+    const text2 = buttonTexts2[b];
+
+    // Scramble animation
+    let btnIteration = 0;
+    const btnInterval = setInterval(() => {
+      btn.innerHTML = text1
+        .split("")
+        .map((letter, index) => {
+          if (letter === "□") return "□";
+          return index < btnIteration
+            ? text1[index]
+            : letters[Math.floor(Math.random() * letters.length)];
+        })
+        .join("");
+
+      if (btnIteration >= text1.length) {
+        clearInterval(btnInterval);
+        btn.innerHTML = btn.innerHTML.replace(/□/g, '<span class="matrix-symbol">□</span>');
+      }
+      btnIteration++;
+    }, 30);
+
+    // --- SPECIAL BUTTON 6 ---
+    if (b === 5) {
+      let open = false;
+      let timer = null;
+
+      const MAX_DATA_FILES = 2;
+
+      btn.addEventListener("click", () => {
+        open = !open;
+
+        if (open) {
+          loadValidFursona();
+          startAutoCycle();
+        } else {
+          stopAutoCycle();
+
+          if (BUTTON6_CLOSE_BEHAVIOR === "A") {
+            btn.innerHTML = text1.replace(/□/g, '<span class="matrix-symbol">□</span>');
+          }
+        }
+      });
+
+      // Load a valid fursona
+      async function loadValidFursona() {
+
+        if (validIDs.length === 0) {
+          btn.innerHTML = "<p>No valid IDs detected.</p>";
+          return;
+        }
+
+        // Refill the shuffle bag if empty
+        if (shuffleBag.length === 0) {
+          refillShuffleBag();
+        }
+
+        // Take the next ID
+        const id = shuffleBag.pop();
+
+
+        const titleURL = `fursonas/${id}-T.txt`;
+        const descURL  = `fursonas/${id}-U.txt`;
+
+        const extraData = [];
+        const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"];
+
+        try {
+          const [titleRes, descRes] = await Promise.all([
+            fetch(titleURL),
+            fetch(descURL)
+          ]);
+
+          if (!titleRes.ok || !descRes.ok) {
+            btn.innerHTML = "<p>Missing data files.</p>";
+            return;
+          }
+
+          const titleText = await titleRes.text();
+          const descText  = await descRes.text();
+
+          // Load optional extra files
+          for (let i = 0; i < MAX_DATA_FILES; i++) {
+            const letter = String.fromCharCode(65 + i);
+            const url = `fursonas/${id}-${letter}.txt`;
+
+            try {
+              const res = await fetch(url);
+              if (res.ok) {
+                const txt = await res.text();
+                extraData.push({ label: letter, text: txt });
+              }
+            } catch {}
+          }
+
+          // Try each image extension
+          let validImage = null;
+
+          for (const ext of imageExtensions) {
+            const imgURL = `fursonas/${id}-I.${ext}`;
+            const img = new Image();
+            img.src = imgURL;
+
+            const loaded = await new Promise(resolve => {
+              img.onload = () => resolve(true);
+              img.onerror = () => resolve(false);
+            });
+
+            if (loaded) {
+              validImage = img;
+              break;
+            }
+          }
+
+          if (!validImage) {
+            btn.innerHTML = "<p>No image found for this ID.</p>";
+            return;
+          }
+
+          shownFursonas.add(id);
+          showFursona(id, titleText, validImage, descText, extraData);
+
+        } catch (e) {
+          btn.innerHTML = "<p>Error loading.</p>";
+        }
+      }
+
+      // Display inside the button (Version A)
+      function showFursona(id, title, img, desc, extraData) {
+        let extrasHTML = "";
+
+        for (const item of extraData) {
+          extrasHTML += `
+            <p style="font-size:0.7em; margin:0;">
+              <strong>${item.label}:</strong> ${item.text}
+            </p>
+          `;
+        }
+
+        btn.innerHTML = `
+          <div style="padding:10px;">
+            <h3 style="margin:0 0 10px 0;">${id}-T</h3>
+            <img src="${img.src}" style="width:100%; border:1px solid #00ff00; margin-bottom:10px;">
+            <p style="font-size:0.8em; margin:0 0 5px 0;"><strong>This is:</strong> ${title}</p>
+            <p style="font-size:0.7em; margin:0 0 10px 0;"><strong>Information about this:</strong> ${desc}</p>
+            ${extrasHTML}
+          </div>
+        `;
+      }
+
+      function startAutoCycle() {
+        stopAutoCycle();
+        timer = setInterval(() => {
+          if (open) loadValidFursona();
+        }, 60000);
+      }
+
+      function stopAutoCycle() {
+        if (timer) clearInterval(timer);
+        timer = null;
+      }
+
+    } else {
+      // Normal toggle buttons
+      let toggled = false;
+      btn.addEventListener("click", () => {
+        toggled = !toggled;
+        const raw = toggled ? text2 : text1;
+        btn.innerHTML = raw.replace(/□/g, '<span class="matrix-symbol">□</span>');
+      });
+    }
+  }
+}
+
+// Run auto-detection BEFORE buttons are created
+detectFursonaIDs().then(() => {
+  console.log("Auto-detection complete.");
+});
+
+
+
+function animateMatrixSymbols() {
+  const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*𓆝 𓆟 𓆞 𓆝 𓆟";
+  const interval = 100; // speed in ms, make sure not too fast
+
+  setInterval(() => {
+    const toggle = document.getElementById("matrixToggle");
+    if (!toggle.checked) return; // animation OFF
+
+    const spans = document.querySelectorAll(".matrix-symbol");
+    spans.forEach(span => {
+      span.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+    });
+  }, interval);
+}
+
+document.getElementById("matrixToggle").addEventListener("change", (e) => {
+  if (!e.target.checked) {
+    document.querySelectorAll(".matrix-symbol").forEach(span => {
+      span.textContent = "□";
+    });
+  }
+});
+
+
+document.addEventListener("click", (e) => {
+  if (e.target.tagName === "A") {
+    e.stopPropagation(); // prevents button toggle
+  }
+});
+
+
+
+</script>
+</body>
+</html>
+
