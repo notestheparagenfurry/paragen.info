@@ -5,7 +5,6 @@
   <meta name="keywords" content="paragen, furry, fursona, furries, furry species, paragen furry, rare furry species">
   <meta name="author" content="notestheparagenfurry@gmail.com">
 
-
   <meta charset="UTF-8">
   <title>Paragen Database</title>
   <link rel="icon" type="image/png" href="TopThing.png">
@@ -204,6 +203,18 @@
     <a href="https://c.tenor.com/OmCqFNJHhEAAAAAd/tenor.gif">Ye very useful link</a>
   </div>
 
+  <div id="visibleIntro" style="color:#00ff00; font-size:0.6em; margin-bottom:20px;">
+    <h2>About the paragen furry species</h2>
+    <p>
+      This is some text, press the buttons as this is to allow the indexing, sorry.
+      This site is under development and not yet finished.
+    </p>
+      <a href="https://c.tenor.com/OmCqFNJHhEAAAAAd/tenor.gif">Ye very useful link</a>
+  </div>
+
+
+
+
   <div id="matrixToggleContainer">
     <label>
       <input type="checkbox" id="matrixToggle" checked>
@@ -217,7 +228,7 @@
 
   <!-- First Question -->
   <div id="introBox">
-    <h1>Are you trying to access this site?</h1>
+    <h1>Are you trying to access the paragen database?</h1>
     <button onclick="answerFurry(true)">Yes</button>
     <button onclick="answerFurry(false)">No</button>
   </div>
@@ -308,8 +319,12 @@ let shuffleBag = [];
       document.getElementById("introBox").style.display = "none";
       if (isFurry) {
         startMatrix();
+        document.getElementById("visibleIntro").style.display = "none";
+
       } else {
-        document.getElementById("futureBox").style.display = "block";
+        document.getElementById("futureBox").style.display = "block"
+        document.getElementById("visibleIntro").style.display = "none";
+
       }
     }
 
