@@ -371,7 +371,7 @@ let shownFursonas = new Set();
 function startMatrix() {
   document.getElementById("mainContent").style.display = "block";
 
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*□𓆝";
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*□";
   const titleText = "WELCOME TO THE PARAGEN DATABASE";
   const subtitleText = "ENJOY YOUR STAY □w□ (THIS IS NOT YET FINISHED)";
 
@@ -615,7 +615,7 @@ Don’t even think about spamming the Email account plz.`
       let open = false;
       let timer = null;
 
-      const MAX_DATA_FILES = 2;
+      const MAX_DATA_FILES = 2;   // --- THIS MUS ALSO BE CHANGED I THINK :O ---
 
       btn.addEventListener("click", () => {
         open = !open;
@@ -770,7 +770,7 @@ detectFursonaIDs().then(() => {
 
 
 function animateMatrixSymbols() {
-  const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*𓆝 𓆟 𓆞 𓆝 𓆟";
+  const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*";
   const interval = 100; // speed in ms, make sure not too fast
 
   setInterval(() => {
