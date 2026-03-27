@@ -36,7 +36,7 @@
     height: 18px; 
     border: 2px solid #00ff00;
     background: black;
-    cursor: pointer;
+    cursor: none;
 
     display: inline-block;
     vertical-align: middle;
@@ -71,20 +71,25 @@
   /* Mobile scaling */
   @media (max-width: 1024px) {
     body {
-      font-size: 3em; /* increase base size */
+      font-size: 2em; /* increase base size */
     button {
-      font-size: 1.4em;
+      font-size: 1.2em;
       padding: 20px 30px;
       max-width: 95vw;
       }
     }
 
+    #matrixToggleContainer input {
+      transform: scale(3);
+      margin-right: 5px;
+    }
+
     #matrixTitle {
-      font-size: 4rem; /* bigger title */
+      font-size: 3rem; /* bigger title */
     }
 
     button {
-      font-size: 1.4em;   /* bigger button text */
+      font-size: 1.2em;   /* bigger button text */
       padding: 20px 30px; /* larger tap area as of cunke fingers*/
       max-width: 95%;     /* fill screen better */
     }
@@ -799,4 +804,3 @@ document.addEventListener("click", (e) => {
 </script>
 </body>
 </html>
-
