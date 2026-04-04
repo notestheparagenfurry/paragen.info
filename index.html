@@ -768,30 +768,28 @@ detectFursonaIDs().then(() => {
 });
 
 
-
 function animateMatrixSymbols() {
   const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*";
   const interval = 100; // speed in ms, make sure not too fast
 
   setInterval(() => {
     const toggle = document.getElementById("matrixToggle");
-    if (!toggle.checked) return; // animation OFF
+    if (toggle.checked) return; // animation off is -> !toggle.checked (the ! is to swithc it back around)
 
     const spans = document.querySelectorAll(".matrix-symbol");
-    spans.forEach(span => {
+    spans.forEach(span => {   
       span.textContent = matrixChars[Math.floor(Math.random() * matrixChars.length)];
     });
   }, interval);
 }
 
 document.getElementById("matrixToggle").addEventListener("change", (e) => {
-  if (!e.target.checked) {
+  if (e.target.checked) {  // !e.target.checked
     document.querySelectorAll(".matrix-symbol").forEach(span => {
       span.textContent = "□";
     });
   }
 });
-
 
 document.addEventListener("click", (e) => {
   if (e.target.tagName === "A") {
