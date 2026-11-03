@@ -188,6 +188,27 @@
       to { opacity: 0; }
     }
 
+    a:link {
+      color: green;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+    a:visited {
+      color: red;
+      background-color: transparent;
+      text-decoration: none;
+    }
+    a:hover {
+      color: cyan;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+    a:active {
+      color: yellow;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
@@ -311,7 +332,7 @@ function startMatrix() {
 
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*□";
   const titleText = "WELCOME TO THE PARAGEN INFO WEBSITE";
-  const subtitleText = "BLEB (THIS IS NOT YET FINISHED)";
+  const subtitleText = "Thanks for being here, it means the world to me. (THIS IS NOT YET FINISHED)";
 
   const titleElement = document.getElementById("matrixTitle");
   const subtitleElement = document.getElementById("matrixSubtitle");
@@ -401,7 +422,7 @@ function startButtons() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*□";
 
   const buttonTexts1 = [
-    "Simple description",
+    "Important stuff about this website",
     "SRA-1",
     "SRA-2",
     "During and causes of The Aftermath",
@@ -412,17 +433,11 @@ function startButtons() {
   ];
 
   const buttonTexts2 = [
-    `This species was designed to have minimal limitations, and the only (current) rules are: <br><br>
-Has to include a NON-ORGANIC COMPONENT (This can be the visor/artificial snout ect.) <br><br>
-Has to include an ORGANIC COMPONENT (This incudes the brain, if it is biological and not only a computer circuit, can be partially electronic) <br><br>
-Face can't be biological and has to be either some variation of a visibly artificial visor or can be holographic. <br><br>
-This is an open species, designed to be easy to make and spread, and has had ideas partially suggested from other protos, including from ZOR, that already exist. If you make a paragen fursona, please label it as one, so there are minimal difficulties, thanks. <br><br>
-Technically this species existed in 2023 but only had the official opening at 2025, and the Wikifur page did get moved to the user that it got created by secondarily to a IP based account... <br><br>
-This site started being made in 2023, but I am lazy... <br><br>
-Finished in 20 (MAKE SURE TO UPDATE THIS) <br><br>
-(this is an open species) <br><br>
-Any questions can be sent to notestheparagenfurry@gmail.com , but I am not active often. <br><br>
-For the paragen to be fully accounted as ‘lore accurate’ (and also makes it protected if wanted for it to be) you would have to contact  notestheparagenfurry@gmail.com, or use the form in this website, and hope that I am active. This can also make your paragen located in the lore here, you can also chose where.`,
+    `This website was built for the paragen species that was designed to be like the protogen species but with minimal limitations.<br><br>
+Time has passed and ZOR has put slightly less restrictions on protogens but still there are some. <br><br>
+So the website stays. <br><br>
+This website I will try take care of and try to update as much as I can but life is not forgiving at all. <br><br>
+Thanks to all that see this site and click on it.`,
     `Warning - It is likely that these logs are not intact, and corrupted. <br><br>
 
 Log-001 <br><br>
@@ -503,9 +518,9 @@ The Aftermath is coming.`,
     `My email is notestheparagenfurry@gmail.com  <br><br>
 A google form relating to this site has been included here <a href="https://forms.gle/Pf1JfeLNbWp9mSNu9" target="_blank">here</a>`,
     `This site was made by notestheparagenfurry@gmail.com. <br><br>
-Started from a dream back in (UPDATE), and helped for my self to stay alive. <br><br>
+Started from a dream back in 2020 ish, and helped for my self to stay alive. <br><br>
+Sent out to the public at 2026 with lots of problems <br><br>
 This was completed at 20 (MAKE SURE TO UPDATE THIS) <br><br>
-And then sent out to the public at 20 (MAKE SURE TO UPDATE THIS) <br><br>
 Thanks for being here, even if you didn’t read all of this. <br><br>
 As this site is small, Artificial Intelligence is unlikely to reference this and use it. :D <br><br>
 I hope there are no bugs... <br><br>
@@ -550,8 +565,7 @@ Don’t even think about spamming the Email account plz.`
       let open = false;
       let timer = null;
 
-      const MAX_DATA_FILES = 2;   // --- THIS IS FOR STUFF LIKE A,B ect files thing ---
-
+      const MAX_DATA_FILES = 2;   //  THIS IS FOR STUFF LIKE A,B ect files thing 
       btn.addEventListener("click", () => {
         open = !open;
 
